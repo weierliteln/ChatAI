@@ -50,7 +50,6 @@ async function chat(input) {
   });
 
   const assistantMessage = completion.choices[0].message
-
   messages.push(assistantMessage);
 
   return assistantMessage.content;
