@@ -4,19 +4,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>ChatAI</title>
+  <link href="./bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  .box {
+    width: 100%;
+    height: 100vh;
+    background-color: #f3f4f8;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .navbar {
+    width: 100%;
+    padding: 10px 5%;
+  }
+
+  .bottom-box {
+    position: relative;
+    /* bottom: 0; */
+    width: 90%;
+    height: 10%;
+    display: flex;
+    justify-content: space-between;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .bottom-box textarea {
+    width: 90%;
+    height: 100%;
+    border-radius: 5px;
+    border: none;
+    padding: 10px 20px;
+    resize: none;
+  }
+
+  textarea:focus {
+    outline: none;
+    border: 1px solid #198754;
+  }
+
+  .bottom-box button {
+    height: 100%;
+    width: 9%;
+    border-radius: 5px;
+    font-size: 20px;
+    /* border: 1px solid #ccc; */
+    background-color: #198754;
+    color: #fff;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+
+  .body-box {
+    width: 90%;
+    height: 75%;
+    overflow-y: auto;
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .body-box .right {
+    display: flex;
+  }
+
+  .user {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .robot {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  img {
+    display: block;
+    background-color: #843c3c;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+  }
+
+  .user .right img {
+    margin-left: 10px;
+  }
+
+  .user .right div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .right div:nth-child(2) {
+    width: 80%;
+    /* background-color: #198754; */
+  }
+
+  .right {
+    display: flex;
+
+  }
+
+  .user .right {
+    flex-direction: row-reverse;
+  }
+
+  .user span {
+    text-align: right;
+  }
+
+  .text-box {
+    background-color: #198754;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    max-width: 80%;
+  }
+
+
+
+  .right span {
+    display: block;
+    font-size: 12px;
+    color: #ccc;
+    margin-left: 10px;
+  }
+
+  .user .right span {
+    margin-right: 10px;
+  }
+</style>
 
 <body>
-  <input type="text" placeholder="please input message">
-  <button onclick="sendMessage()">send</button>
-  <div></div>
+
+  <div class="box">
+    <nav class="navbar bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand">ChatAI</a>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="body-box">
+    </div>
+
+    <div class="mb-3 bottom-box">
+      <textarea maxlength="100"></textarea>
+      <button class="btn btn-outline-success" type="button" onclick="sendMessage()">发送</button>
+    </div>
+  </div>
+
+
+
+
   <script src="/socket.io/socket.io.js"></script>
+  <script src="./bootstrap-5.3.0-alpha1-dist/js/bootstrap.min.js"></script>
   <script>
     const socket = io('http://localhost:3000');
 
-    const input = document.querySelector('input');
-    const div = document.querySelector('div');
+    const input = document.querySelector('textarea');
     const button = document.querySelector('button');
 
 
@@ -29,21 +198,44 @@
       });
       // 清空输入框
       input.value = '';
-      const p = document.createElement('p');
-      const date = new Date().toLocaleString();
-      p.innerText = '我：' + date + '\n' + message;
-      div.appendChild(p);
+
+      const div = document.querySelector('.body-box');
+      // 创建类名为user的div
+      const user = document.createElement('div');
+      user.className = 'user';
+      user.innerHTML = `<div class="right">
+        <img src="./pictures/orange.jpg" alt="">
+        <div>
+          <span>${new Date().toLocaleString()}</span>
+          <p class="text-box">${message}</p>
+        </div>
+      </div>`;
+      div.appendChild(user);
     }
 
     // 接收服务器发送的消息
     socket.on('receiveMessage', (data) => {
       console.log(data);
-      const p = document.createElement('p');
-      const date = new Date().toLocaleString();
-      p.innerText = '机器人：' + date + '\n' + data.message;
-      // p.innerText = data.message;
-      div.appendChild(p);
-      p.style.color = 'red';
+      const div = document.querySelector('.body-box');
+      // 创建类名为robot的div
+      const robot = document.createElement('div');
+      robot.className = 'robot';
+      robot.innerHTML = `<div class="right">
+        <img src="./pictures/pink.jpg" alt="">
+        <div>
+          <span>${new Date().toLocaleString()}</span>
+          <p class="text-box">${data.message}</p>
+        </div>
+      </div>
+      `;
+      div.appendChild(robot);
+    });
+
+    // 监听回车键
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
     });
   </script>
 </body>
