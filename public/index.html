@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="text" placeholder="please input message">
+  <button onclick="sendMessage()">send</button>
+  <div></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:3000');
+
+    const input = document.querySelector('input');
+    const div = document.querySelector('div');
+    const button = document.querySelector('button');
+
+
+
+    // 发送消息
+    function sendMessage() {
+      const message = input.value;
+      socket.emit('sendMessage', {
+        message
+      });
+      // 清空输入框
+      input.value = '';
+      const p = document.createElement('p');
+      const date = new Date().toLocaleString();
+      p.innerText = '我：' + date + '\n' + message;
+      div.appendChild(p);
+    }
+
+    // 接收服务器发送的消息
+    socket.on('receiveMessage', (data) => {
+      console.log(data);
+      const p = document.createElement('p');
+      const date = new Date().toLocaleString();
+      p.innerText = '机器人：' + date + '\n' + data.message;
+      // p.innerText = data.message;
+      div.appendChild(p);
+      p.style.color = 'red';
+    });
+  </script>
+</body>
+
+</html>
